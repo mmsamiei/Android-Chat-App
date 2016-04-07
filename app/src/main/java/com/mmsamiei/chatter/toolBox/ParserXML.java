@@ -5,11 +5,13 @@ import android.util.Log;
 import com.mmsamiei.chatter.interfacer.Updater;
 import com.mmsamiei.chatter.typo.InfoOfFriends;
 import com.mmsamiei.chatter.typo.InfoOfMessage;
+import com.mmsamiei.chatter.typo.InfoStatus;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.util.Vector;
+import java.util.jar.Attributes;
 
 /**
  * Created by Win2 on 3/26/2016.
@@ -56,4 +58,39 @@ public class ParserXML extends DefaultHandler {
         this.updater.updateData((InfoOfMessage[])messages,friends,unApprovedFriends,userKey);
         super.endDocument();
     }
+    public void startElement(String uri,String localName,String name,Attributes attributes) throws SAXException {
+         if(localName == "friend"){
+             InfoOfFriends friend = new InfoOfFriends();
+             friend.userName= attributes.getValue(InfoOfFriends.Username);
+             String status = attributes.getValue(InfoOfFriends.Status);
+
+             friend.port=attributes.getValue(InfoOfFriends.Port);
+
+             if(status != null && status.equals("online")){
+                 friend.status = InfoStatus.ONLINE;
+             }
+
+            else if(status.equals("unApproved")){
+                 friend.status=InfoStatus.UNAPPROVED;
+                 mUnapprovedFriends.add(friend);
+             }
+             else{
+                 friend.status=InfoStatus.OFFLINE;
+                 mFriends.add(friend);
+             }
+         }
+        else if (localName == "user") {
+             this.userKey = attributes.getValue(InfoOfFriends.userKey);
+         }
+       super.startElement(uri,localName,name, (org.xml.sax.Attributes) attributes);
+    }
+
+    @Override
+    public void startDocument() throws SAXException{
+        this.mFriends.clear();
+        this.mOnlineFriends.clear();
+        this.mUnreadMessages.clear();
+        super.startDocument();
+    }
+
 }

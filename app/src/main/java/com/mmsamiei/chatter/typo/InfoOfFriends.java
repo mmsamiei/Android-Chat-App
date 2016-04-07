@@ -11,4 +11,8 @@ public class InfoOfFriends {
     public static final String Ip = "ip";
     public static final String Userkey = "userKey";
     public static final String Message = "message ";
+    public static String userKey;
+    public String userName;
+    public String port;
+    public InfoStatus status;
 }
